@@ -1,7 +1,7 @@
 
 {
-  "name": "substack-app-cheerio",
-  "version": "1.0.2",
+  "name": "substack-app-scraper",
+  "version": "1.0.3",
   "scripts": {
     "dev": "react-scripts start",
     "build": "react-scripts build"

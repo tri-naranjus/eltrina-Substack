@@ -6,7 +6,7 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('/api')
+    fetch('/api/posts')
       .then(res => res.json())
       .then(data => setArticles(data))
       .catch(err => setError(err.message));
