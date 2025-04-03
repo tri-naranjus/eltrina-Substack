@@ -1,2 +1,2 @@
-# El Trina Substack App
-Esta app muestra tus artículos de Substack en una web hecha en React.
+# El Trina Substack App con Cheerio
+Versión mejorada con extracción más precisa de imagen y resumen.

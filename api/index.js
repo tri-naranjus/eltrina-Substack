@@ -1,40 +1,38 @@
 
-import { JSDOM } from 'jsdom';
+import cheerio from 'cheerio';
 
 export default async function handler(req, res) {
   try {
     const response = await fetch('https://eltrina.substack.com/feed');
     const xml = await response.text();
 
-    const dom = new JSDOM();
-    const parser = new dom.window.DOMParser();
-    const xmlDoc = parser.parseFromString(xml, 'text/xml');
-    const items = xmlDoc.querySelectorAll('item');
+    const $ = cheerio.load(xml, { xmlMode: true });
+    const items = $('item');
 
-    const posts = Array.from(items).map(item => {
-      const title = item.querySelector('title')?.textContent;
-      const link = item.querySelector('link')?.textContent;
-      const pubDate = item.querySelector('pubDate')?.textContent;
-      const description = item.querySelector('description')?.textContent || '';
-      const contentEncoded = item.querySelector('content\:encoded')?.textContent || '';
+    const posts = [];
 
-      const html = contentEncoded || description;
-      const doc = new JSDOM(html).window.document;
-      const firstImg = doc.querySelector('img');
-      const firstP = doc.querySelector('p');
+    items.each((_, el) => {
+      const title = $(el).find('title').text();
+      const link = $(el).find('link').text();
+      const pubDate = $(el).find('pubDate').text();
+      const content = $(el).find('content\:encoded').text() || $(el).find('description').text();
 
-      return {
+      const $content = cheerio.load(content);
+      const firstImg = $content('img').first().attr('src') || null;
+      const firstText = $content('p').first().text().trim().slice(0, 300);
+
+      posts.push({
         title,
         link,
         pubDate,
-        image: firstImg?.src || null,
-        summary: firstP?.textContent?.substring(0, 300) || ''
-      };
+        image: firstImg,
+        summary: firstText
+      });
     });
 
     res.status(200).json(posts);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error parsing RSS feed' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching or parsing Substack feed' });
   }
 }

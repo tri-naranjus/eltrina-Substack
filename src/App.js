@@ -7,21 +7,19 @@ function App() {
 
   useEffect(() => {
     fetch('/api')
-      .then((res) => res.json())
-      .then((data) => setArticles(data))
-      .catch((err) => setError(err.message));
+      .then(res => res.json())
+      .then(data => setArticles(data))
+      .catch(err => setError(err.message));
   }, []);
 
   return (
-    <div style={{ padding: 20, fontFamily: 'Arial' }}>
-      <h1>Artículos de El Trina (Substack)</h1>
-      {error && <p>Error: {error}</p>}
+    <div style={{ padding: 20, fontFamily: 'Arial', maxWidth: 800, margin: '0 auto' }}>
+      <h1>Artículos de El Trina</h1>
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
       {articles.map((post, index) => (
-        <div key={index} style={{ marginBottom: 40 }}>
+        <div key={index} style={{ marginBottom: 40, borderBottom: '1px solid #ddd', paddingBottom: 20 }}>
           <h2>
-            <a href={post.link} target="_blank" rel="noopener noreferrer">
-              {post.title}
-            </a>
+            <a href={post.link} target="_blank" rel="noopener noreferrer">{post.title}</a>
           </h2>
           <small>{post.pubDate}</small>
           {post.image && (
