@@ -7,18 +7,8 @@ function App() {
 
   useEffect(() => {
     fetch('/api')
-      .then((res) => res.text())
-      .then((xml) => {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xml, 'text/xml');
-        const items = xmlDoc.querySelectorAll('item');
-        const posts = Array.from(items).map((item) => ({
-          title: item.querySelector('title')?.textContent,
-          link: item.querySelector('link')?.textContent,
-          pubDate: item.querySelector('pubDate')?.textContent,
-        }));
-        setArticles(posts);
-      })
+      .then((res) => res.json())
+      .then((data) => setArticles(data))
       .catch((err) => setError(err.message));
   }, []);
 
@@ -26,17 +16,22 @@ function App() {
     <div style={{ padding: 20, fontFamily: 'Arial' }}>
       <h1>Artículos de El Trina (Substack)</h1>
       {error && <p>Error: {error}</p>}
-      <ul>
-        {articles.map((post, index) => (
-          <li key={index}>
+      {articles.map((post, index) => (
+        <div key={index} style={{ marginBottom: 40 }}>
+          <h2>
             <a href={post.link} target="_blank" rel="noopener noreferrer">
               {post.title}
             </a>
-            <br />
-            <small>{post.pubDate}</small>
-          </li>
-        ))}
-      </ul>
+          </h2>
+          <small>{post.pubDate}</small>
+          {post.image && (
+            <div style={{ margin: '10px 0' }}>
+              <img src={post.image} alt="preview" style={{ maxWidth: '100%' }} />
+            </div>
+          )}
+          <p>{post.summary}...</p>
+        </div>
+      ))}
     </div>
   );
 }
